@@ -1,29 +1,59 @@
-import streamlit as st
+from pathlib import Path
+from datetime import datetime
+
 import pandas as pd
+import streamlit as st
 
 
 @st.cache_data
+def _carregar_excel_cache(
+    arquivo,
+    ultima_modificacao
+):
+    return pd.read_excel(arquivo)
+
+
 def carregar_resultados():
-    return pd.read_excel(
+
+    arquivo = Path(
         "datasets/Resultado_Lotofacil.xlsx"
     )
 
+    return _carregar_excel_cache(
+        str(arquivo),
+        arquivo.stat().st_mtime
+    )
 
-@st.cache_data
+
 def carregar_jogos():
 
-    df = pd.read_excel(
+    arquivo = Path(
         "datasets/Jogos_Realizados.xlsx"
     )
 
-    colunas_dezenas = [
-        col
-        for col in df.columns
-        if col.startswith("D")
-    ]
+    return _carregar_excel_cache(
+        str(arquivo),
+        arquivo.stat().st_mtime
+    )
 
-    for col in colunas_dezenas:
 
-        df[col] = df[col].astype("Int64")
+def obter_data_atualizacao_resultados():
 
-    return df
+    arquivo = Path(
+        "datasets/Resultado_Lotofacil.xlsx"
+    )
+
+    return datetime.fromtimestamp(
+        arquivo.stat().st_mtime
+    )
+
+
+def obter_data_atualizacao_jogos():
+
+    arquivo = Path(
+        "datasets/Jogos_Realizados.xlsx"
+    )
+
+    return datetime.fromtimestamp(
+        arquivo.stat().st_mtime
+    )

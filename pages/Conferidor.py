@@ -1,6 +1,11 @@
 import streamlit as st
 
-from modules.loader import carregar_jogos, carregar_resultados
+from modules.loader import (
+    carregar_jogos,
+    carregar_resultados,
+    obter_data_atualizacao_jogos,
+    obter_data_atualizacao_resultados
+)
 from modules.conferidor import conferir_intervalo
 
 
@@ -46,9 +51,35 @@ st.set_page_config(
 # Carregamento dos dados
 df_jogos = carregar_jogos()
 df_resultados = carregar_resultados()
+data_jogos = obter_data_atualizacao_jogos()
+
+data_resultados = (
+    obter_data_atualizacao_resultados()
+)
 
 # Título
 st.title("✅ Conferidor de Jogos")
+
+col_data1, col_data2 = st.columns(2)
+
+with col_data1:
+
+    st.caption(
+        "📅 Jogos atualizados em: "
+        + data_jogos.strftime(
+            "%d/%m/%Y %H:%M:%S"
+        )
+    )
+
+with col_data2:
+
+    st.caption(
+        "🎲 Resultados atualizados em: "
+        + data_resultados.strftime(
+            "%d/%m/%Y %H:%M:%S"
+        )
+    )
+
 st.divider()
 
 # # Métricas iniciais
@@ -217,11 +248,18 @@ jogos_estilizados = (
     df_jogos
     .set_index("Jogo")
     .style
+    .format(
+        lambda x:
+        "" if str(x) == "nan"
+        else f"{int(x)}"
+        if isinstance(x, (int, float))
+        else x
+    )
     .set_properties(
         **{
             "text-align": "center"
         }
-    )   
+    )
 )
 
 st.dataframe(
